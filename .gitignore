@@ -173,3 +173,7 @@ CATKIN_IGNORE
 # bag files
 .bag
 *.bag
+
+## Big stuff
+
+/ldso/dso/build

@@ -1,0 +1,10 @@
+cam0:
+  camera_model: pinhole
+  intrinsics: [1594.2, 1597.0, 553.3839, 951.9867]
+  distortion_model: equidistant
+#  distortion_model: radtan
+  distortion_coeffs: [0.0087, -0.1385, 0.0, 0.0]
+  resolution: [1920, 1080]
+  rostopic: /annotated_images
+  tagtopic: /detector/tags
+  rig_body: rig

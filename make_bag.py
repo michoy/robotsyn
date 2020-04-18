@@ -1,6 +1,4 @@
 #!/usr/bin/env python2
-# -*- coding: utf-8 -*-
-
 
 '''
 
@@ -27,20 +25,20 @@ from cv_bridge import CvBridge
 import cv2
 
 TOPIC = 'camera/image_raw'
+prop_fps = 50
 
 def CreateVideoBag(videopath, bagname):
     '''Creates a bag file with a video file'''
     bag = rosbag.Bag(bagname, 'w')
     cap = cv2.VideoCapture(videopath)
     cb = CvBridge()
-    prop_fps = 24
     ret = True
     frame_id = 0
     while(ret):
         ret, frame = cap.read()
         if not ret:
             break
-        stamp = rospy.rostime.Time.from_sec(float(frame_id) / prop_fps)
+        stamp = rospy.rostime.Time.from_sec(float(frame_id) / prop_fps + 1)
         frame_id += 1
         image = cb.cv2_to_imgmsg(frame, encoding='bgr8')
         image.header.stamp = stamp

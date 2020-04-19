@@ -1,0 +1,16 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Plot debug",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/tagslam/plot.py",
+            "console": "integratedTerminal",
+            "args": ["tagslam/2020-04-19-14-27-09.bag.active"]
+        }
+    ]
+}

@@ -14,20 +14,39 @@ rviz -d tagslam/tagslam_example.rviz & roslaunch tagslam tagslam.launch bag:=tag
 
 ### Actual footage
 
+Set ros to use sim time
+```rosparam set use_sim_time true```
+
+
 Run offline detection of tags 
 
-```
-roslaunch tagslam sync_and_detect.launch bag:=`rospack find tagslam`/example/example.bag
-```
+```roslaunch min_test detect.launch bag:=`rospack find min_test`/<bagname>```
 
-feed output bag into tagslam.launch and visualize with rviz
 
-```
-rviz -d tagslam/tagslam_example.rviz & roslaunch tagslam tagslam.launch bag:=tagslam/example.bag
-```
+Feed output bag into tagslam.launch and visualize with rviz
+
+```rviz -d rviz_config.rviz & roslaunch min_test tagslam.launch bag:=`rospack find min_test`/<detections_bag>```
+
+
+If tags are not rendered
+
+```roslaunch tagslam_viz visualize_tags.launch tag_id_file:=$HOME/.ros/poses.yaml```
+
+
+Make recording of tagslam estimate (and then rename and reindex)
+
+```rosbag record /tagslam/odom/body_rig & roslaunch min_test tagslam.launch bag:=`rospack find min_test`/<detections_bag>```
+
+Rename bag recording to <odom_bag>, and reindex it
+
+```rosbag reindex <odom_bag>```
+
+
+Make xy-plot of trajectory
+
+```python plot.py <odom_bag>```
+
 
 
 ## Current issues
-
-sync and detect wont play the bag. Works on the default example. 
 

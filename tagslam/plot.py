@@ -1,6 +1,6 @@
 #!/usr/bin/env python2
 
-import rospy, rosbag, json, sys
+import rospy, rosbag, sys
 import matplotlib.pyplot as plt
 
 
@@ -18,11 +18,3 @@ z = [pos.z for pos in positions]
 
 plt.plot(y, x)
 plt.show()
-
-def save_to_file():
-    with open('position_log.json', 'w') as log:
-        data = {"x": x, "y": y, "z": z}
-        json.dump(data, log)
-
-
-save_to_file()

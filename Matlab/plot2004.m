@@ -5,7 +5,11 @@ clc
 
 % Get data
 data_orb      = 0;
-data_dso      = 0;
+
+fileID      = fopen('odom2.txt','r');
+data_dso    = fscanf(fileID,'%f');
+fclose(fileID);
+
 data_tagslam  = 0;
 
 % Processing of data
@@ -19,13 +23,13 @@ t_orb      = 0;
 label_orb  = 'ORB-SLAM';
 color_orb  = [0, 0.4470, 0.7410];
 
-x_dso      = 0;
-y_dso      = 0;
-z_dso      = 0;
+x_dso      = data_dso(5:13:end);
+y_dso      = data_dso(9:13:end);
+z_dso      = data_dso(13:13:end);
 yaw_dso    = 0;
 pitch_dso  = 0;
 roll_dso   = 0;
-t_dso      = 0;
+t_dso      = data_dso(1:13:end);
 label_dso  = 'DSO';
 color_dso  = [0.8500, 0.3250, 0.0980];
 
@@ -118,3 +122,12 @@ legend(label_orb,label_dso,label_tagslam)
 title('Yaw')
 xlabel('t')
 ylabel('radians')
+
+%===== FIGURE 4 =======================%
+% 3D plot of the trajectories
+figure(4)
+
+plot3(x_orb,y_orb,z_orb)
+hold on
+plot3(x_dso,y_dso,z_dso)
+plot3(x_tagslam,y_tagslam,z_tagslam)

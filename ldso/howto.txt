@@ -1,0 +1,5 @@
+Kjøre DSO:
+
+rosrun dso_ros dso_live image:=/camera/image_raw calib=/home/esten/prosjekt_robotsyn/robotsyn/Kalibrering/camera.txt nogui=1 sampleoutput=1 quiet=1  
+
+Må sjekke kalibrering!

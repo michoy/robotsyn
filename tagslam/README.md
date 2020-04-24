@@ -14,6 +14,8 @@ rviz -d tagslam/tagslam_example.rviz & roslaunch tagslam tagslam.launch bag:=tag
 
 ### Actual footage
 
+source devel/setup.bash & source ~/tagslam_root/devel/setup.bash 
+
 Start a ros core
 ```
 roscore
@@ -44,7 +46,7 @@ Make recording of a tagslam replay
 rosservice call /tagslam/replay & rosbag record /tagslam/odom/body_rig
 ```
 
-(optional step: rename bag)
+(optional step: rename bag) 
 
 Make xy-plot of trajectory
 ```

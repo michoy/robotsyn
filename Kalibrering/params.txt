@@ -1,2 +1,0 @@
-De her er bare kanskje riktige
-distortion_coeffs: [-0.167373, 0.110745, 8.09217e-05, 7.34253e-05, -0.0286819]

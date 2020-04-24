@@ -5,12 +5,12 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Plot debug",
+            "name": "Debug stuff",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}/tagslam/plot.py",
+            "program": "${workspaceFolder}/tagslam/fix_origin.py",
             "console": "integratedTerminal",
-            "args": ["tagslam/2020-04-19-14-27-09.bag.active"]
+            "args": ["tagslam/res_bags/runde3-fakeodom.bag"]
         }
     ]
 }

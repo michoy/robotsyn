@@ -3,36 +3,44 @@ close all
 clear all
 clc
 
-% Get data and making odom martices
+% Available data 
+file_orb = {'litenRunde_orb.bag', 'rettFram_orb.bag', 'rotasjon_orb.bag'};
 
+file_dso = {'litenRunde_odom_with_pcalib.txt', 'rettFram_odom_with_pcalib.txt', 'rotasjon_odom_with_pcalib2.txt'};
 
-fileID       = fopen('odom2.txt','r');
+file_tagslam = {'litenRunde_tagslam.bag', 'rettFram_tagslam.bag', 'rotasjon_tagslam.bag'};
+
+% Use
+use = 1;
+
+bag = rosbag(file_orb{use});
+bSel = select(bag,'Topic','/orb_slam2_mono/pose');
+msgStructs = readMessages(bSel,'DataFormat','struct');
+% I dont know how to get timestamp
+[x, y, z, quat1, quat2, quat3, quat4, t_orb] = extract_from_odomstructorb(msgStructs);
+matrix_orb = make_matrix(x, y, z, quat1, quat2, quat3, quat4);
+
+fileID       = fopen(file_dso{use},'r');
 data_dso     = fscanf(fileID,'%f');
 fclose(fileID);
 matrix_dso   = make_matrix_dso_style(data_dso);
 
-bag = rosbag('litenRunde-badkalib.bag');
+bag = rosbag(file_tagslam{use});
 bSel = select(bag,'Topic','/tagslam/odom/body_rig');
 msgStructs = readMessages(bSel,'DataFormat','struct');
-% I dont know how to get timestamp from odom
-[x, y, z, quat1, quat2, quat3, quat4, t_tagslam] = extract_from_odomstruct(msgStructs);
+% I dont know how to get timestamp
+[x, y, z, quat1, quat2, quat3, quat4, t_tagslam] = extract_from_odomstructtag(msgStructs);
 matrix_tagslam = make_matrix(x, y, z, quat1, quat2, quat3, quat4);
 
-
-% Setting referance frame
-%matrix_orb     = set_referance_frame(matrix_orb,matrix_orb{1});
-matrix_dso     = reset_referance_frame(matrix_dso,matrix_dso{1});
-matrix_tagslam = reset_referance_frame(matrix_tagslam,matrix_tagslam{1});
+% Here one can apply rotations and translations to frames
+matrix_orb     = transform(matrix_orb,matrix_orb{1});
+matrix_dso     = transform(matrix_dso,matrix_dso{1});
+matrix_tagslam = transform(matrix_tagslam,matrix_tagslam{1});
 
 % Accessing data for plotting
-%[x_orb, y_orb, z_orb, yaw_orb, pitch_orb, roll_orb] = extract_from_matrix(matrix_orb);
-x_orb      = 0;
-y_orb      = 0;
-z_orb      = 0;
-yaw_orb    = 0;
-pitch_orb  = 0;
-roll_orb   = 0;
-t_orb      = 0;
+
+[x_orb, y_orb, z_orb, roll_orb, pitch_orb, yaw_orb] = extract_from_matrix(matrix_orb);
+t_orb      = t_orb;
 label_orb  = 'ORB-SLAM';
 color_orb  = [0, 0.4470, 0.7410];
 
@@ -74,7 +82,7 @@ xlabel('t')
 ylabel('meters')
 
 subplot(3,1,2)
-plot(t_dso,y_orb,'Color',color_orb)
+plot(t_orb,y_orb,'Color',color_orb)
 hold on
 plot(t_dso,y_dso,'Color',color_dso)
 plot(t_tagslam,y_tagslam,'Color',color_tagslam)
@@ -106,7 +114,7 @@ xlabel('t')
 ylabel('radians')
 
 subplot(3,1,2)
-plot(t_dso,pitch_orb,'Color',color_orb)
+plot(t_orb,pitch_orb,'Color',color_orb)
 hold on
 plot(t_dso,pitch_dso,'Color',color_dso)
 plot(t_tagslam,pitch_tagslam,'Color',color_tagslam)
@@ -131,6 +139,7 @@ plot3(x_orb,y_orb,z_orb)
 hold on
 plot3(x_dso,y_dso,z_dso)
 plot3(x_tagslam,y_tagslam,z_tagslam)
+legend(label_orb,label_dso,label_tagslam,'Location', 'Best')
 
 function [x, y, z, roll, pitch, yaw] = extract_from_matrix(matrix);
     % Function for extracting this from a 3x4 matrix
@@ -152,7 +161,7 @@ function [x, y, z, roll, pitch, yaw] = extract_from_matrix(matrix);
     end
 end
 
-function [x, y, z, quat1, quat2, quat3, quat4, t] = extract_from_odomstruct(struct)
+function [x, y, z, quat1, quat2, quat3, quat4, t] = extract_from_odomstructtag(struct)
     % Function for extracting this from a 3x4 matrix
     N     = length(struct);
     x     = 1:N;
@@ -175,7 +184,30 @@ function [x, y, z, quat1, quat2, quat3, quat4, t] = extract_from_odomstruct(stru
     end
 end
 
-function matrix = reset_referance_frame(matrix,matrix2)
+function [x, y, z, quat1, quat2, quat3, quat4, t] = extract_from_odomstructorb(struct)
+    % Function for extracting this from a 3x4 matrix
+    N     = length(struct);
+    x     = 1:N;
+    y     = 1:N;
+    z     = 1:N;
+    quat1   = 1:N;
+    quat2   = 1:N;
+    quat3   = 1:N;
+    quat4   = 1:N;
+    t       = 1:N;
+    for i = 1:N
+        x(i) = struct{i}.Pose.Position.X;
+        y(i) = struct{i}.Pose.Position.Y;
+        z(i) = struct{i}.Pose.Position.Z;
+        quat1(i) = struct{i}.Pose.Orientation.X;
+        quat2(i) = struct{i}.Pose.Orientation.Y;
+        quat3(i) = struct{i}.Pose.Orientation.Z;
+        quat4(i) = struct{i}.Pose.Orientation.W;
+        t(i)     = 0;
+    end
+end
+
+function matrix = transform(matrix,matrix2)
     N = length(matrix);
     for i = 1:N
     matrix{i}(:,1:3) = matrix{i}(:,1:3)*inv(matrix2(:,1:3));

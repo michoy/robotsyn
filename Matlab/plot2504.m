@@ -5,8 +5,14 @@ clc
 
 % Get data and making odom martices
 
+bag = rosbag('litenRunde-badkalib.bag');
+bSel = select(bag,'Topic','/tagslam/odom/body_rig');
+msgStructs = readMessages(bSel,'DataFormat','struct');
+% I dont know how to get timestamp from odom
+[x, y, z, quat1, quat2, quat3, quat4, t] = extract_from_odomstructorb(struct)
+matrix_orb = make_matrix(x, y, z, quat1, quat2, quat3, quat4);
 
-fileID       = fopen('odom2.txt','r');
+fileID       = fopen('rettFram_odom_DSO_without_pcalib.txt','r');
 data_dso     = fscanf(fileID,'%f');
 fclose(fileID);
 matrix_dso   = make_matrix_dso_style(data_dso);
@@ -15,12 +21,11 @@ bag = rosbag('litenRunde-badkalib.bag');
 bSel = select(bag,'Topic','/tagslam/odom/body_rig');
 msgStructs = readMessages(bSel,'DataFormat','struct');
 % I dont know how to get timestamp from odom
-[x, y, z, quat1, quat2, quat3, quat4, t_tagslam] = extract_from_odomstruct(msgStructs);
+[x, y, z, quat1, quat2, quat3, quat4, t_tagslam] = extract_from_odomstructtag(msgStructs);
 matrix_tagslam = make_matrix(x, y, z, quat1, quat2, quat3, quat4);
 
-
 % Setting referance frame
-%matrix_orb     = set_referance_frame(matrix_orb,matrix_orb{1});
+% matrix_orb     = set_referance_frame(matrix_orb,matrix_orb{1});
 matrix_dso     = reset_referance_frame(matrix_dso,matrix_dso{1});
 matrix_tagslam = reset_referance_frame(matrix_tagslam,matrix_tagslam{1});
 
@@ -152,7 +157,30 @@ function [x, y, z, roll, pitch, yaw] = extract_from_matrix(matrix);
     end
 end
 
-function [x, y, z, quat1, quat2, quat3, quat4, t] = extract_from_odomstruct(struct)
+function [x, y, z, quat1, quat2, quat3, quat4, t] = extract_from_odomstructtag(struct)
+    % Function for extracting this from a 3x4 matrix
+    N     = length(struct);
+    x     = 1:N;
+    y     = 1:N;
+    z     = 1:N;
+    quat1   = 1:N;
+    quat2   = 1:N;
+    quat3   = 1:N;
+    quat4   = 1:N;
+    t       = 1:N;
+    for i = 1:N
+        x(i) = struct{i}.Pose.Pose.Position.X;
+        y(i) = struct{i}.Pose.Pose.Position.Y;
+        z(i) = struct{i}.Pose.Pose.Position.Z;
+        quat1(i) = struct{i}.Pose.Pose.Orientation.X;
+        quat2(i) = struct{i}.Pose.Pose.Orientation.Y;
+        quat3(i) = struct{i}.Pose.Pose.Orientation.Z;
+        quat4(i) = struct{i}.Pose.Pose.Orientation.W;
+        t(i)     = 0;
+    end
+end
+
+function [x, y, z, quat1, quat2, quat3, quat4, t] = extract_from_odomstructorb(struct)
     % Function for extracting this from a 3x4 matrix
     N     = length(struct);
     x     = 1:N;

@@ -59,6 +59,9 @@ def plot_positions(tagslam_pos, orbslam_pos):
 	z_orb = [pos.z for pos in orbslam_pos]
 	ax.plot3D(x_orb, y_orb, z_orb, label='orbslam')
     
+	ax.set_xlabel('x')
+	ax.set_ylabel('y')
+	ax.set_zlabel('z')
 	ax.legend()
 	plt.grid()
 	plt.show()
@@ -92,9 +95,9 @@ T_translate = np.array([
 q = (offset.orientation.x, offset.orientation.y, offset.orientation.z, offset.orientation.w)
 euler = euler_from_quaternion(q)
 
-Rx = rotation_matrix(-euler[0], [1, 0, 0])
-Ry = rotation_matrix(-euler[1], [0, 1, 0])
-Rz = rotation_matrix(-euler[2], [0, 0, 1])
+Rx = rotation_matrix(euler[0], [1, 0, 0])
+Ry = rotation_matrix(euler[1], [0, 1, 0])
+Rz = rotation_matrix(euler[2], [0, 0, 1])
 
 positions_tmp = list()
 for pose in tagslam_poses:
